@@ -1,0 +1,79 @@
+name: Skill Packaging
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "SKILL.md"
+      - "prompts/**"
+      - "templates/**"
+      - "examples/**"
+      - "tests/**"
+      - "scripts/**"
+      - ".github/workflows/skill-packaging.yml"
+  pull_request:
+    paths:
+      - "SKILL.md"
+      - "prompts/**"
+      - "templates/**"
+      - "examples/**"
+      - "tests/**"
+      - "scripts/**"
+      - ".github/workflows/skill-packaging.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-skill-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Validate SKILL.md completeness
+        run: |
+          python -c "
+          content = open('SKILL.md', encoding='utf-8').read()
+          required_sections = [
+              'Identity', 'Activation Triggers', 'Conversation Flow',
+              'Phase 1', 'Phase 2', 'Phase 3',
+              'Edge Case Handling', 'Quality Standards Checklist',
+          ]
+          missing = [s for s in required_sections if s not in content]
+          if missing:
+              print(f'SKILL.md 缺少以下章节: {missing}')
+              import sys; sys.exit(1)
+          print('SKILL.md 完整性验证通过')
+          "
+
+      - name: Validate prompts/ flat structure
+        run: |
+          required_prompts="system_prompt step_01_experience_anchor step_02_character_card step_03_touchpoint_map step_04_core_loop step_05_function_anchor step_06_behavior_rules step_07_dialogue_samples step_08_bible_assembly step_09_portfolio_review"
+          for prompt in $required_prompts; do
+            test -f "prompts/${prompt}.md" || { echo "缺少 prompt: prompts/${prompt}.md"; exit 1; }
+            test -s "prompts/${prompt}.md" || { echo "prompt 文件为空: prompts/${prompt}.md"; exit 1; }
+          done
+          echo "所有 prompt 文件验证通过"
+
+      - name: Validate templates/ structure
+        run: |
+          required_templates="npc_design_bible_template character_concept_card touchpoint_map behavior_rule_table portfolio_review_checklist"
+          for tmpl in $required_templates; do
+            test -f "templates/${tmpl}.md" || { echo "缺少模板: templates/${tmpl}.md"; exit 1; }
+          done
+          echo "所有模板文件验证通过"
+
+      - name: Validate example Bible structure
+        run: |
+          python scripts/validate_bible.py examples/tea_grandma_cozy_sim/npc_design_bible_output.md --verbose
+
+      - name: Verify CHANGELOG.md
+        run: |
+          test -f CHANGELOG.md || { echo "缺少 CHANGELOG.md"; exit 1; }
+          echo "CHANGELOG.md 验证通过"
