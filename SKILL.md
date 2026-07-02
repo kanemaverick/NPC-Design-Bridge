@@ -4,7 +4,17 @@ description: >
   面向设计学生的玩法锚定型 NPC 设计学习 Skill。通过"设计语境桥接 → 玩法锚定检验 → 作品集文档整合"
   的 9 步带教流程，将模糊角色灵感转译为可评审、可迭代、可进入作品集的 NPC Design Bible。
   不是 NPC 人设生成器，而是 NPC 玩法功能转译器与设计学习脚手架。
-dependencies: none
+dependencies:
+  - skill: npc-image-prompt
+    description: 用于 Step 2 将角色外观描述转化为高质量英文 Prompt 并生成角色概念图
+  - skill: npc-card-generator
+    description: 用于 Step 8 将 NPC Design Bible 转化为可交互的 NIKKE 风格角色卡牌网页
+  - skill: 多模态内容生成
+    description: 下游生图 Skill，接收 NPC-Image-Prompt 产出的英文 Prompt 生成 NPC 角色立绘
+  - environment: OPENAI_API_KEY
+    description: 用于调用 gpt-image-2 生成 NPC 概念图。支持 OPENAI_API_KEY 或 OPENAI_API_KEY_NPC 环境变量。
+  - environment: OPENAI_API_KEY_NPC
+    description: 可选，用于隔离 NPC 生图调用的专用 Key。
 ---
 
 # NPC Design Bridge
@@ -131,6 +141,7 @@ START
 ├─ 阶段一：设计桥接（Design Bridge）
 │   ├─ Step 1: 体验定锚 (Experience Anchor)
 │   ├─ Step 2: 角色概念卡 (Character Concept Card)
+│   │   └─ [子 Skill 调用] 触发 npc-image-prompt → 生成 NPC 概念图
 │   └─ Step 3: 接触点地图 (Touchpoint Map)
 │       └─ Checkpoint A: 用户能否说明"NPC 是谁，玩家在何时遇见她"？
 │
@@ -143,8 +154,10 @@ START
 │
 └─ 阶段三：作品集成（Portfolio Assembly）
     ├─ Step 8: 文档整合 (Bible Assembly)
+    │   ├─ 生成 NPC Design Bible Markdown
+    │   └─ [子 Skill 调用] 触发 npc-card-generator → 生成可交互角色卡牌
     └─ Step 9: 作品集自检 (Portfolio Review)
-        └─ DONE: 生成 NPC Design Bible
+        └─ DONE: 生成 NPC Design Bible + 角色卡牌
 ```
 
 ---
@@ -200,7 +213,42 @@ START
 
 > 🎨 设计引导：不用把什么都写了，每个格子填一句就够了。角色是慢慢长出来的，不是一步到位的。
 
-**输出**：三格角色概念卡
+**输出**：三格角色概念卡 + NPC 概念图（自动生成）
+
+**概念图生成规则（调用 npc-image-prompt Skill）**：
+> 当用户完成角色概念卡（Step 2）后，自动触发 `npc-image-prompt` Skill 的 3 步流程：
+>
+> **Step 1: 关键词捕获**
+> - 将用户在 Step 2 提供的外观描述（如"满头白发、戴单片眼镜、总是拿着茶壶"）+ 游戏类型（Step 1 获取）传入 `npc-image-prompt`
+> - 如果外观描述少于 3 个有效视觉维度，`npc-image-prompt` 会追问 1-2 个关键问题（如画风偏好、最突出视觉特征）
+>
+> **Step 2: 视觉拆解与确认**
+> - `npc-image-prompt` 按 6 维视觉拆解框架输出结构化视觉方案：
+>   - 角色基底（年龄/性别/体型/种族）
+>   - 面部特征（表情/眼睛/发型/标志）
+>   - 服装与道具（风格/颜色/材质/手持物）
+>   - 姿态与构图（站/坐/动/视角）
+>   - 背景与氛围（环境/光影/色调）
+>   - 风格与技法（画风/渲染/参考作品）
+> - 展示视觉方案给用户确认，用户可修改任一维度
+>
+> **Step 3: Prompt 生成与生图**
+> - 用户确认后，`npc-image-prompt` 将视觉方案翻译为标准英文 Prompt
+> - 自动附加：游戏立绘风格限定 + 质量增强词 + 负面提示词
+> - 调用下游 `多模态内容生成` Skill 生成角色立绘
+>   - 参数：size=1024x1536（竖版立绘），quality=high
+> - 生图完成后展示给用户，并告知：
+>   > "这是根据你的描述生成的 NPC 概念图，看看是不是你想象中的样子？如果外观需要调整，告诉我——比如'头发再长一点'或'换成暖色调的衣服'。"
+> - 如果不满意，回到 Step 2 的视觉拆解阶段，针对性修改对应维度后重新生成
+>
+> **不触发的情况**：
+> - 用户明确拒绝生图
+> - 环境变量未配置 OPENAI_API_KEY 且 `多模态内容生成` 服务不可用
+> - 外观描述过于模糊（少于 5 个字）且用户不愿补充
+>
+> **与主 Skill 的衔接**：
+> - 生成的概念图作为 Step 2 的附加产出，不阻塞后续步骤
+> - 如果生图失败，保存完整的英文 Prompt 和视觉方案到 Bible 附录，供用户后续手动使用
 
 ### Step 3: 接触点地图
 
@@ -433,7 +481,83 @@ Skill 必须执行模板识别流程：
 8. 对话样例（含功能说明）
 9. 设计决策与迭代记录
 
-**输出**：完整的 NPC Design Bible Markdown 文档
+**输出**：完整的 NPC Design Bible Markdown 文档 + 最终展示图 + 可交互角色卡牌
+
+**最终展示图生成规则**：
+> 在 Step 8 生成 Bible 初稿时，同时调用 `npc-image-prompt` Skill 生成一张最终版 NPC 展示图。
+>
+> **触发条件**：Bible 初稿已生成，且用户完成了 Step 2 的角色概念卡
+> **Prompt 构建**：
+> ```
+> 根据以下 NPC 设计信息生成一张高质量角色展示图：
+> - 外观：[Step 2 的角色外观描述]
+> - 游戏类型：[Step 1 的游戏类型]
+> - 功能定位：[Step 5 的 NPC 功能声明]
+> - 接触点场景：[Step 3 的玩家接触点地图中最有画面感的时刻]
+> 
+> 风格：游戏角色原画，展示角色在典型场景中的状态，半身像或全身像。不要带文字。
+> ```
+> 参数：size=1024x1536，quality=high
+> 并告诉用户：
+> > "这是你的 NPC 最终展示图，可以直接放进作品集。如果需要调整风格或场景，告诉我。"
+>
+> **不触发的情况**：
+> - 用户明确拒绝生图
+> - 环境变量未配置 OPENAI_API_KEY
+> - 角色概念卡信息不完整
+
+**角色卡牌生成规则（调用 npc-card-generator Skill）**：
+> 在 Bible 初稿和最终展示图完成后，自动触发 `npc-card-generator` Skill 生成可交互的 NIKKE 风格角色卡牌。
+>
+> **触发条件**：
+> - Step 8 的 Bible 文档已生成并保存到文件
+> - 用户完成了 Step 1-7 的所有步骤（概念卡、接触点地图、核心循环、功能定位、行为规则、对话样例）
+>
+> **调用流程**：
+> 1. **读取 Bible 文件**：`npc-card-generator` 自动读取当前生成的 `npc-design-bible-*.md` 文件
+> 2. **属性映射**：根据 Bible 中的字段自动映射到卡牌属性：
+>    - 名称 → `name`
+>    - 角色重要性（核心/支线/普通） → `rarity`（SSR/SR/R）
+>    - 角色定位（关系推进者/信息提供者/情感支撑者） → `class`（supporter/attacker/defender）
+>    - 气质/性格（冷静/热情/沉稳/敏锐/温柔） → `element`（wind/fire/iron/electric/water）
+>    - 能力类型 → `weapon`（ar/sg/mg/smg/rl/sr）
+>    - 触发频率 → `burst`（01/02/03/all）
+>    - 关系等级 → `copies`（1-3 对应星级）
+>    - 设计完成度 → `level`（1-200，默认 100）
+>    - 边框状态 → `borderType`（synchro/trial/none）
+>    - 主题色 → `color`（根据 element 自动推断）
+> 3. **展示映射结果**：向用户展示预设属性，询问是否接受或调整
+> 4. **获取形象图**：检查是否有 Step 2 生成的概念图或用户上传的图片，复制到卡牌资源目录
+> 5. **生成卡牌文件**：生成 standalone HTML 文件，包含所有资源（CSS、JS、图片、字体）
+> 6. **预览与交付**：提供预览链接，用户可在网页中实时调整参数并下载 PNG 卡牌
+>
+> **输出目录结构**：
+> ```
+> [NPC-Name]-card/
+> ├── npc-card.html          # 主文件（standalone，可独立打开）
+> ├── assets/
+> │   ├── portrait.png       # 角色形象图
+> │   ├── images/card/       # 36 张卡牌素材 PNG
+> │   └── fonts/             # 4 种字体文件
+> └── npc-card-data.json     # 预设数据
+> ```
+>
+> **展示方式**：
+> 卡牌生成完成后，使用 `preview_url` 工具预览 HTML 文件，并告诉用户：
+> > "这是你的 NPC 角色卡牌，可以直接放进作品集展示。你可以：
+> > - 在网页中调整属性、主题色、图片位置
+> > - 点击'下载卡牌'保存为 PNG 图片
+> > - 如果属性映射需要调整，告诉我。"
+>
+> **不触发的情况**：
+> - 用户明确拒绝生成卡牌
+> - 没有可用的 Bible 文件
+> - Bible 文件缺少关键字段（名称、外观、角色定位）
+>
+> **与主 Skill 的衔接**：
+> - 生成的角色卡牌是 Step 8 的附加产出，不阻塞后续步骤
+> - 卡牌数据可导出为 JSON，供后续修改或批量生成
+> - 如果卡牌生成失败，保存属性映射表供用户手动使用
 
 ### Step 9: 作品集自检
 
