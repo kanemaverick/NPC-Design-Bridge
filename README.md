@@ -214,6 +214,74 @@ npc-design-bridge/
 
 ---
 
+## Learning-by-Design / 做中学式设计流程
+
+本 Skill 不先灌输理论，而是让用户先完成一个小设计动作，再解释这个动作背后的设计根源。
+
+每一步都经历：
+
+```text
+Design Move / 做一个设计判断
+    ↓
+Immediate Outcome / 得到即时结果
+    ↓
+Design Root Card / 理解设计原则
+    ↓
+Improve Once / 优化一版
+    ↓
+Decision Log / 记录决策理由
+```
+
+让 NPC 设计过程从"AI 替你写"变成"AI 陪你学会怎么设计"。
+
+---
+
+## Design Reference Lens / 设计参考镜头
+
+NPC Design Bridge 内置一套可维护的设计参考意见库，包括 15 个**交互设计术语 Tips**、15 个**NPC 设计模板**、12 个**经典游戏 NPC 案例**和 9 个**设计理论根源**。
+
+当用户提出 NPC 想法时，Skill 会自动识别相关术语与模板，并从成熟游戏案例中提取可参考的设计模式。
+
+每个参考源都标注了**可靠性等级**（A/B/C/D），让用户知道建议的可信度。
+
+### 术语示例
+
+> **Feedback / 反馈** — 设计课语言：玩家做完一件事后，NPC 如何告诉"收到了"？
+>
+> **Agency / 玩家主体性** — 玩家可以选择拒绝这个 NPC 的帮助吗？如果不可以，为什么？
+
+### 模板示例
+
+> **T02 Pacing NPC / 节奏调节器** — 解决：游戏节奏容易让玩家疲劳时，需要一个"缓冲点"。适合治愈经营类、重复劳动模拟类游戏。
+
+### 案例示例
+
+> **Elizabeth (BioShock Infinite)** — "Goal-side positioning"技术：NPC 不在玩家背后，而是在玩家和下一个目标之间。
+>
+> **Ellie (The Last of Us)** — 三阶段跟随系统 + 玩家从不会 blame NPC 的设计哲学。
+
+---
+
+## Template-Assisted Co-Design / 模板辅助协作设计
+
+Skill 不会暗中套用模板——它会**透明地**推荐 2-3 个候选模板、说明每个模板的适用理由和主要风险，等待用户确认后再使用。
+
+```text
+识别用户意图 → 匹配候选模板 → 解释适用场景和风险 → 用户确认
+→ 套用模板生成初版 → 反套路优化 → 记录到 Decision Log
+```
+
+示例输出：
+
+| 候选模板 | 相关术语 | 参考案例 | 适配理由 | 主要风险 |
+|---------|---------|---------|---------|---------|
+| T02 节奏调节器 | Pacing / Feedback | RE4 Merchant | 可缓冲玩家节奏 | 容易变成纯情绪陪伴 |
+| T05 世界观入口 | Progressive Disclosure | Elden Ring NPC | 可分阶段释放世界观 | 容易信息倾倒 |
+
+> 模板是脚手架，不是答案。案例是参考，不是照抄。理论是解释依据，不是堆文献。
+
+---
+
 ## 创新亮点
 
 ### 删除测试 (Remove-Test)
@@ -221,11 +289,11 @@ npc-design-bridge/
 
 ### 功能罗盘
 ```
-        情感锚点
-            ↑
+      情感锚点
+         ↑
  阻力 ←  NPC  →  奖励
-            ↓
-        信息源
+         ↓
+       信息源
 ```
 
 ### 三镜头评审
@@ -245,8 +313,8 @@ npc-design-bridge/
 
 | 案例 | 游戏类型 | NPC 功能 | 状态 |
 |-----|---------|---------|------|
-| 温柔老奶奶 | 治愈经营 | 节奏调节器 | ✅ 完整 |
-| 可疑商人 | RPG | 风险-奖励制造者 | 🔜 待补充 |
+| 温柔老奶奶 | 治愈经营 | 节奏调节器 (T02) | ✅ 完整 |
+| 废土伙伴女孩 | 末日生存探索 | 补充性感知伙伴 (T09+T08) | ✅ 完整 |
 | 沉默机器人 | 科幻解谜 | 非语言引导者 | 🔜 待补充 |
 | 失踪广播员 | 恐怖探索 | 信息碎片分发者 | 🔜 待补充 |
 
@@ -288,7 +356,38 @@ MIT © 2025 NPC Design Bridge
 
 ---
 
+## Reference Sources / 参考信源
+
+本文档库中的设计理论、游戏案例和交互设计术语基于以下来源：
+
+### 游戏设计理论框架
+- Hunicke, R., LeBlanc, M., & Zubek, R. (2004). *MDA: A Formal Approach to Game Design and Game Research.* AAAI. — [Game Developer](https://www.gamedeveloper.com/design/revisiting-the-mda-framework)
+- Schell, J. (2008/2019). *The Art of Game Design: A Book of Lenses.* CRC Press.
+- Adams, E. (2014). *Fundamentals of Game Design.* New Riders.
+- Salen, K. & Zimmerman, E. (2004). *Rules of Play: Game Design Fundamentals.* MIT Press.
+
+### 游戏 NPC 案例参考
+- GDC Vault: *"Bringing BioShock Infinite's Elizabeth to Life: An AI Development Postmortem"* — John Abercrombie (Irrational Games, 2014)
+- GDC 2014: *"Ellie: Buddy AI in The Last Of Us"* — Max Dyckhoff (Naughty Dog)
+- GDC Vault: *"Creating Frankenstein's Monster: Case Studies of Building a New NPC"* — Daniel Brewer & Rez Graham
+- GDC Vault: *"Teaching Nix to Behave in Star Wars Outlaws"* (2025)
+- Game Developer: *"The Perfect Organism: The AI of Alien: Isolation"* — Andy Bray (Creative Assembly, 2016)
+- Valve Developer Commentary: *Half-Life 2 / Portal / Portal 2*
+
+### 交互设计与 UX
+- Norman, D. (2013). *The Design of Everyday Things.* Basic Books.
+- Nielsen, J. (1995). *10 Usability Heuristics for User Interface Design.* Nielsen Norman Group.
+- Hodent, C. (2017). *The Gamer's Brain: How Neuroscience and UX Design Impact Game Design.* CRC Press.
+- Murray, J. (1997). *Hamlet on the Holodeck: The Future of Narrative in Cyberspace.* MIT Press.
+
+### 媒体报道与分析
+- Polygon, Kotaku, Eurogamer, IGN (Game Design Analysis Series)
+- Giant Bomb Wiki, Resident Evil Wiki, Elden Ring Wiki
+
+---
+
 <div align="center">
+
 
 *Made with ❤️ for TT 设计学院 Skill 创新应用大赛*
 
