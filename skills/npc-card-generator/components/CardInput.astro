@@ -1,0 +1,135 @@
+---
+
+---
+
+<div class="input-wrapper">
+    <div class="input-main">
+        <div class="row">
+            <input type="text" class="fullwidth" id="text" placeholder='Name' autocomplete="off" />
+            <div class="input-button" id="generate"><span>Refresh</span></div>
+            <input type="color" id="color" value="#ffce00" autocomplete="off" />
+        </div>
+        <div class="row">
+            <input type="text" id="char-card-search" class="fullwidth" placeholder="🔎 Look for NIKKE character's portrait..." autocomplete="off" />
+            <div class="pfp-preview" style="border-radius: 4px;">
+                <img id="card-preview" src="/nikke-font-generator/images/blabla/pfp/nochat.png"/>
+            </div>
+        </div>
+        <div class="row">
+            <label for="char-card-upload" class="input-button fullwidth">
+                <span>Upload portrait...</span>
+                <input type="file" id="char-card-upload" accept="image/*" autocomplete="off" />
+            </label>
+            <div class="filler-square"></div>
+            <div class="filler-square"></div>
+        </div>
+
+        <div class="row takeheight">
+            <h4>Card Transforms</h4>
+        </div>
+        <div class="row takeheight">
+            <div class="column">
+                <span>X Position</span>
+                <input type="number" id="xposcd" step="10" class="fullwidth" value="0" autocomplete="off" />
+            </div>
+            <div class="column">
+                <span>Y Position</span>
+                <input type="number" id="yposcd" step="10" class="fullwidth" value="0" autocomplete="off" />
+            </div>
+            <div class="column">
+                <span>Scale (%)</span>
+                <input type="number" id="scalecd" class="fullwidth" value="100" autocomplete="off" />
+            </div>
+            <div class="column">
+                <span>Drag</span>
+                <div class="input-button square text-button" id="dragcd">OFF</div>
+            </div>
+        </div>
+        
+        <div class="row takeheight">
+            <h4>Rarity</h4>
+        </div>
+        <div class="row">
+            <div class="input-button fullwidth" style="font-weight: bold;" id="ssr">
+                SSR
+            </div>
+            <div class="input-button fullwidth" style="font-weight: normal;" id="sr">
+                SR
+            </div>
+            <div class="input-button fullwidth" style="font-weight: normal;" id="r">
+                R
+            </div>
+        </div>
+
+        <div class="row takeheight">
+            <h4>Attributes</h4>
+        </div>
+        <div class="row">
+            <select id="element" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Element</option>
+                <option value="fire">Fire</option>
+                <option value="water">Water</option>
+                <option value="wind">Wind</option>
+                <option value="iron">Iron</option>
+                <option value="electric">Electric</option>
+            </select>
+            <select id="weapon" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Weapon</option>
+                <option value="ar">Assault Rifle</option>
+                <option value="sg">Shotgun</option>
+                <option value="mg">Machine Gun</option>
+                <option value="smg">Sub-machine Gun</option>
+                <option value="sr">Sniper Rifle</option>
+                <option value="rl">Rocket Launcher</option>
+            </select>
+            <select id="burst" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Burst</option>
+                <option value="01">I</option>
+                <option value="02">II</option>
+                <option value="03">III</option>
+                <option value="all">All</option>
+            </select>
+        </div>
+        <div class="row">
+            <select id="nikke-type" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Border Type</option>
+                <option value="none">None</option>
+                <option value="synchro">Synchro</option>
+                <option value="trial">Trial</option>
+            </select>
+            <select id="nikke-class" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Class</option>
+                <option value="attacker">Attacker</option>
+                <option value="defender">Defender</option>
+                <option value="supporter">Supporter</option>
+            </select>
+        </div>
+        <div class="row">
+            <select id="nikke-fav-status" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Favorite Status</option>
+                <option value="none">No Favorite Item</option>
+                <option value="unmaxed">Unmaxed (White)</option>
+                <option value="maxed">Maxed (Gray)</option>
+            </select>
+            <select id="nikke-fav-rarity" class="fullwidth" autocomplete="off">
+                <option value="" disabled selected>Favorite Rarity</option>
+                <option value="ssr">SSR</option>
+                <option value="sr">SR</option>
+                <option value="r">R</option>
+            </select>
+        </div>
+        <div class="row">
+            <input type="number" id="level" class="input-button fullwidth" placeholder="Level" min="0" autocomplete="off">
+            <input type="number" id="copies" class="input-button fullwidth" placeholder="Copies" min="0" autocomplete="off">
+        </div>
+
+        <div class="row takeheight">
+            <h4></h4>
+        </div>
+        <div class="row">
+            <div class="input-button fullwidth" id="download">
+                <span><i class='bx bxs-download'></i> Download Card</span>
+            </div>
+        </div>
+    </div>
+</div>

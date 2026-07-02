@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPC 角色卡牌生成器 — 飞飞</title>
+    <style>
+        @font-face {
+            font-family: 'PB';
+            src: url('./assets/fonts/Pretendard-Bold.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'AE';
+            src: url('./assets/fonts/AireExterior.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'ABOL';
+            src: url('./assets/fonts/AbolitionTest-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'AZO';
+            src: url('./assets/fonts/Azonix.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'AIRE';
+            src: url('./assets/fonts/AireExterior.ttf') format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PB', 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #f4d259;
+            text-align: center;
+        }
+
+        .card-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        canvas#card-canvas {
+            max-width: 311px;
+            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'PB', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #f4d259;
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            background: #ffe066;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .info-panel {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .info-panel h3 {
+            font-size: 16px;
+            color: #f4d259;
+            margin-bottom: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .controls-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .controls-panel h3 {
+            font-size: 18px;
+            color: #f4d259;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .control-group h4 {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .control-row label {
+            width: 80px;
+            font-size: 13px;
+            color: #ccc;
+            flex-shrink: 0;
+        }
+
+        .control-row input[type="text"],
+        .control-row input[type="number"],
+        .control-row select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .control-row input[type="color"] {
+            width: 60px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .control-row input[type="range"] {
+            flex: 1;
+            accent-color: #f4d259;
+        }
+
+        .control-row input[type="file"] {
+            flex: 1;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .control-row span {
+            width: 50px;
+            text-align: right;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .rarity-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-family: 'PB', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rarity-btn.active {
+            background: #f4d259;
+            color: #1a1a2e;
+            border-color: #f4d259;
+            font-weight: bold;
+        }
+
+        .rarity-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .rarity-btn.active:hover {
+            background: #ffe066;
+        }
+    </style>
+</head>
+<body>
+    <h1>NPC 角色卡牌 — 飞飞</h1>
+
+    <div class="card-display">
+        <canvas id="card-canvas" width="311" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" id="download">下载卡牌 PNG</button>
+        <button class="btn btn-secondary" id="rerender">重新渲染</button>
+    </div>
+
+    <div class="controls-panel">
+        <h3>调整参数</h3>
+        
+        <div class="control-group">
+            <h4>基础信息</h4>
+            <div class="control-row">
+                <label>名称</label>
+                <input type="text" id="input-name" value="飞飞" placeholder="角色名称">
+            </div>
+            <div class="control-row">
+                <label>主题色</label>
+                <input type="color" id="input-color" value="#2ced73">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>稀有度</h4>
+            <div class="control-row">
+                <button class="rarity-btn active" data-rarity="ssr">SSR</button>
+                <button class="rarity-btn" data-rarity="sr">SR</button>
+                <button class="rarity-btn" data-rarity="r">R</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>图片调整</h4>
+            <div class="control-row">
+                <label>X 偏移</label>
+                <input type="range" id="input-x" min="-200" max="200" value="0">
+                <span id="val-x">0</span>
+            </div>
+            <div class="control-row">
+                <label>Y 偏移</label>
+                <input type="range" id="input-y" min="-200" max="200" value="0">
+                <span id="val-y">0</span>
+            </div>
+            <div class="control-row">
+                <label>缩放</label>
+                <input type="range" id="input-scale" min="50" max="200" value="100">
+                <span id="val-scale">100%</span>
+            </div>
+            <div class="control-row">
+                <label>上传图片</label>
+                <input type="file" id="input-upload" accept="image/*">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>属性</h4>
+            <div class="control-row">
+                <label>元素</label>
+                <select id="input-element">
+                    <option value="fire">Fire</option>
+                    <option value="water">Water</option>
+                    <option value="wind" selected>Wind</option>
+                    <option value="iron">Iron</option>
+                    <option value="electric">Electric</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <label>武器</label>
+                <select id="input-weapon">
+                    <option value="ar" selected>Assault Rifle</option>
+                    <option value="sg">Shotgun</option>
+                    <option value="mg">Machine Gun</option>
+                    <option value="smg">Sub-machine Gun</option>
+                    <option value="sr">Sniper Rifle</option>
+                    <option value="rl">Rocket Launcher</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <label>Burst</label>
+                <select id="input-burst">
+                    <option value="01">I</option>
+                    <option value="02">II</option>
+                    <option value="03" selected>III</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <label>Class</label>
+                <select id="input-class">
+                    <option value="attacker">Attacker</option>
+                    <option value="defender">Defender</option>
+                    <option value="supporter" selected>Supporter</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>边框</h4>
+            <div class="control-row">
+                <select id="input-border">
+                    <option value="none">None</option>
+                    <option value="synchro" selected>Synchro</option>
+                    <option value="trial">Trial</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h4>数值</h4>
+            <div class="control-row">
+                <label>等级</label>
+                <input type="number" id="input-level" min="0" max="200" value="100">
+            </div>
+            <div class="control-row">
+                <label>星级</label>
+                <input type="number" id="input-copies" min="0" max="10" value="3">
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h3>NPC 数据映射</h3>
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">名称</span><span class="info-value">飞飞</span></div>
+            <div class="info-item"><span class="info-label">稀有度</span><span class="info-value">SSR (核心角色)</span></div>
+            <div class="info-item"><span class="info-label">角色定位</span><span class="info-value">关系推进者</span></div>
+            <div class="info-item"><span class="info-label">气质类型</span><span class="info-value">冷静沉稳 (Wind)</span></div>
+            <div class="info-item"><span class="info-label">能力类型</span><span class="info-value">观察分析 (AR)</span></div>
+            <div class="info-item"><span class="info-label">触发频率</span><span class="info-value">关键时刻 (III)</span></div>
+            <div class="info-item"><span class="info-label">关系等级</span><span class="info-value">3 / 3 星</span></div>
+            <div class="info-item"><span class="info-label">设计完成度</span><span class="info-value">LV. 100</span></div>
+            <div class="info-item"><span class="info-label">边框状态</span><span class="info-value">Synchro (已解锁)</span></div>
+            <div class="info-item"><span class="info-label">主题色</span><span class="info-value" style="color:#2ced73">#2ced73</span></div>
+        </div>
+    </div>
+
+<script>
+// ==================== util.js (内联) ====================
+
+function draw9slice(ctx, img2, squareslice, x, y, w, h, color = "#ffffff") {
+    const canvasTemp = document.createElement("canvas");
+    const ctxTemp = canvasTemp.getContext("2d");
+
+    canvasTemp.width = img2.width;
+    canvasTemp.height = img2.height;
+
+    if (color != '#ffffff') {
+        ctxTemp.fillStyle = color;
+        ctxTemp.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+        ctxTemp.globalCompositeOperation = "destination-in";
+    }
+
+    ctxTemp.drawImage(img2, 0, 0);
+    ctxTemp.globalCompositeOperation = "source-over";
+
+    let img = canvasTemp;
+
+    const sx = squareslice[0];
+    const sy = squareslice[1];
+    const sw = squareslice[2];
+    const sh = squareslice[3];
+
+    let cw = w - sx - (img.width - (sx + sw));
+    let ch = h - sy - (img.height - (sy + sh));
+
+    cw = cw < 0 ? 0 : cw;
+    ch = ch < 0 ? 0 : ch;
+
+    x = Math.round(x);
+    y = Math.ceil(y);
+
+    ctx.drawImage(img, 0, 0, sx, sy, x, y, sx, sy);
+    ctx.drawImage(img, 0, sy + sh, sx, img.height - (sy + sh), x, y + sy + ch, sx, img.height - (sy + sh));
+    ctx.drawImage(img, sx + sw, 0, img.width - (sx + sw), sy, x + sx + cw, y, img.width - (sx + sw), sy);
+    ctx.drawImage(img, sx + sw, sy + sh, img.width - (sx + sw), img.height - (sy + sh), x + sx + cw, y + sy + ch, img.width - (sx + sw), img.height - (sy + sh));
+
+    ctx.drawImage(img, 0, sy, sx, sh, x, y + sy, sx, ch);
+    ctx.drawImage(img, sx + sw, sy, img.width - (sx + sw), sh, x + sx + cw, y + sy, img.width - (sx + sw), ch);
+    ctx.drawImage(img, sx, 0, sw, sy, x + sx, y, Math.ceil(cw), sy);
+    ctx.drawImage(img, sx, sy + sh, sw, img.height - (sy + sh), x + sx, y + sy + ch, Math.ceil(cw), img.height - (sy + sh));
+
+    ctx.drawImage(img, sx, sy, sw, sh, x + sx, y + sy, Math.ceil(cw), ch);
+}
+
+function recolorImage(img, color = "#ffffff") {
+    const canvasTemp = document.createElement("canvas");
+    const ctxTemp = canvasTemp.getContext("2d");
+
+    canvasTemp.width = img.width;
+    canvasTemp.height = img.height;
+
+    ctxTemp.drawImage(img, 0, 0);
+    ctxTemp.globalCompositeOperation = "source-in";
+
+    if (color != '#ffffff') {
+        ctxTemp.fillStyle = color;
+        ctxTemp.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+    }
+
+    ctxTemp.globalCompositeOperation = "source-over";
+
+    const canvasCopy = document.createElement("canvas");
+    canvasCopy.width = img.width;
+    canvasCopy.height = img.height;
+    canvasCopy.getContext("2d").drawImage(canvasTemp, 0, 0);
+
+    ctxTemp.clearRect(0, 0, canvasTemp.width, canvasTemp.height);
+    ctxTemp.drawImage(img, 0, 0);
+    ctxTemp.globalCompositeOperation = "multiply";
+    ctxTemp.drawImage(canvasCopy, 0, 0);
+
+    return canvasTemp;
+}
+
+function rowBlank(imageData, width, y) {
+    for (var x = 0; x < width; ++x) {
+        if (imageData.data[y * width * 4 + x * 4 + 3] !== 0) return false;
+    }
+    return true;
+}
+
+function columnBlank(imageData, width, x, top, bottom) {
+    for (var y = top; y < bottom; ++y) {
+        if (imageData.data[y * width * 4 + x * 4 + 3] !== 0) return false;
+    }
+    return true;
+}
+
+var trimCanvas = (function () {
+    return function (canvas) {
+        var ctx = canvas.getContext("2d");
+        var width = canvas.width;
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var top = 0, bottom = imageData.height, left = 0, right = imageData.width;
+
+        while (top < bottom && rowBlank(imageData, width, top)) ++top;
+        while (bottom - 1 > top && rowBlank(imageData, width, bottom - 1)) --bottom;
+        while (left < right && columnBlank(imageData, width, left, top, bottom)) ++left;
+        while (right - 1 > left && columnBlank(imageData, width, right - 1, top, bottom)) --right;
+
+        if (right - left === 0 || bottom - top === 0) {
+            return canvas;
+        }
+
+        var trimmed = ctx.getImageData(left, top, right - left, bottom - top);
+        var copy = canvas.ownerDocument.createElement("canvas");
+        var copyCtx = copy.getContext("2d");
+        copy.width = trimmed.width;
+        copy.height = trimmed.height;
+        copyCtx.putImageData(trimmed, 0, 0);
+
+        return copy;
+    };
+})();
+
+function translateCoordinates(e, canvas) {
+    const clientRect = canvas.getBoundingClientRect();
+    const adjustedX = (e.clientX - clientRect.left) * (canvas.width / canvas.offsetWidth);
+    const adjustedY = (e.clientY - clientRect.top) * (canvas.height / canvas.offsetHeight);
+    return [adjustedX, adjustedY];
+}
+
+// ==================== card.js (核心逻辑) ====================
+
+const canvas = document.getElementById("card-canvas");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+const BASE_PATH = './assets';
+
+let bg = new Image();
+bg.src = `${BASE_PATH}/images/card/card_bg.png`;
+
+let synchroBorder = new Image();
+synchroBorder.src = `${BASE_PATH}/images/card/synchro_border.png`;
+
+let trialBorder = new Image();
+trialBorder.src = `${BASE_PATH}/images/card/trial_border.png`;
+
+let decoBar = new Image();
+decoBar.src = `${BASE_PATH}/images/card/deco_weirdbar.png`;
+
+let decoBar2 = new Image();
+decoBar2.src = `${BASE_PATH}/images/card/deco_weirdbar2.png`;
+
+let decoOverlay = new Image();
+decoOverlay.src = `${BASE_PATH}/images/card/overlay.png`;
+
+let decoSynchro = new Image();
+decoSynchro.src = `${BASE_PATH}/images/card/ele_synchro_upgrade_deco.png`;
+
+let char = new Image();
+let charHasImage = false;
+
+let classAttacker = new Image();
+classAttacker.src = `${BASE_PATH}/images/card/icn_class_attacker.png`;
+
+let classDefender = new Image();
+classDefender.src = `${BASE_PATH}/images/card/icn_class_defender.png`;
+
+let classSupporter = new Image();
+classSupporter.src = `${BASE_PATH}/images/card/icn_class_supporter.png`;
+
+let hexFrameDark = new Image();
+hexFrameDark.src = `${BASE_PATH}/images/card/hex_frame_dark.png`;
+
+let hexFrameLight = new Image();
+hexFrameLight.src = `${BASE_PATH}/images/card/hex_frame_light.png`;
+
+let hexStroke1 = new Image();
+hexStroke1.src = `${BASE_PATH}/images/card/hex_stroke_1.png`;
+
+let hexStroke2 = new Image();
+hexStroke2.src = `${BASE_PATH}/images/card/hex_stroke_2.png`;
+
+let favoriteIcon = new Image();
+favoriteIcon.src = `${BASE_PATH}/images/card/favorite.png`;
+
+let burst1 = new Image();
+burst1.src = `${BASE_PATH}/images/card/icn_burst_01.png`;
+
+let burst2 = new Image();
+burst2.src = `${BASE_PATH}/images/card/icn_burst_02.png`;
+
+let burst3 = new Image();
+burst3.src = `${BASE_PATH}/images/card/icn_burst_03.png`;
+
+let burstall = new Image();
+burstall.src = `${BASE_PATH}/images/card/icn_burst_all.png`;
+
+let lbEmpty = new Image();
+lbEmpty.src = `${BASE_PATH}/images/card/lb_empty.png`;
+
+let lbFilled = new Image();
+lbFilled.src = `${BASE_PATH}/images/card/lb_filled.png`;
+
+let coreNumBG = new Image();
+coreNumBG.src = `${BASE_PATH}/images/card/core_bg.png`;
+
+let coreMax = new Image();
+coreMax.src = `${BASE_PATH}/images/card/MAX.png`;
+
+const classes = {
+    attacker: classAttacker,
+    defender: classDefender,
+    supporter: classSupporter
+}
+
+const bursts = {
+    burst01: burst1,
+    burst02: burst2,
+    burst03: burst3,
+    burstall: burstall
+}
+
+const favItemColor = {
+    "ssr": "#fe6c00",
+    "sr": "#bd53fe",
+    "r": "#00bffe"
+}
+
+const elementColors = {
+    "fire": "#fe0000",
+    "wind": "#2ced73",
+    "iron": "#fe9000",
+    "electric": "#f700f2",
+    "water": "#0376f6"
+}
+
+const elements = {}
+for (const i of ['fire', 'wind', 'iron', 'electric', 'water']) {
+    let element = new Image();
+    element.src = `${BASE_PATH}/images/card/icn_element_${i}.png`;
+    elements[i] = element;
+}
+
+const weapons = {}
+for (const i of ['ar', 'mg', 'smg', 'rl', 'sr', 'sg']) {
+    let weapon = new Image();
+    weapon.src = `${BASE_PATH}/images/card/icn_weapon_${i}.png`;
+    weapons[i] = weapon;
+}
+
+let curBorder = "synchro";
+let curBurst = "03";
+let curColor = "#2ced73";
+let curRarity = "ssr";
+let curClass = "supporter";
+let curCopies = 3;
+let curLevel = 100;
+let curName = "飞飞";
+let curElement = "wind";
+let curWeapon = "ar";
+let curTransforms = [0, 0, 1];
+let curFavStatus = "none";
+let curFavRarity = "ssr";
+let dragging = false;
+
+function generateCard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = 311;
+    canvas.height = 600;
+
+    // draw bg
+    if (bg.complete && bg.naturalWidth > 0) {
+        ctx.drawImage(bg, 1, canvas.height - bg.height - 1);
+    }
+
+    // draw character (cover mode - fill card, smart crop to show upper body)
+    if (charHasImage && char.complete && char.naturalWidth > 0) {
+        const canvasTemp = document.createElement("canvas");
+        const ctxTemp = canvasTemp.getContext("2d");
+        
+        const targetW = 271;
+        const targetH = 520; // fill most of the card body
+        
+        canvasTemp.width = targetW;
+        canvasTemp.height = targetH;
+        
+        // Calculate cover scaling
+        const scaleX = targetW / char.width;
+        const scaleY = targetH / char.height;
+        const scale = Math.max(scaleX, scaleY) * curTransforms[2];
+        
+        const scaledW = char.width * scale;
+        const scaledH = char.height * scale;
+        
+        // Center horizontally
+        const offsetX = (scaledW - targetW) / 2 - curTransforms[0];
+        
+        // For vertical cropping: align to top, show more upper body
+        // If image is taller than target, shift up to show head/upper body
+        let offsetY;
+        if (scaledH > targetH) {
+            // Image is taller than card area: show top portion
+            // Default: show 70% from top, 30% from bottom
+            offsetY = (scaledH - targetH) * 0.15 - curTransforms[1];
+        } else {
+            // Image is shorter: center vertically
+            offsetY = (scaledH - targetH) / 2 - curTransforms[1];
+        }
+        
+        ctxTemp.drawImage(char, -offsetX, -offsetY, scaledW, scaledH);
+        
+        // Draw within the card art frame. The NIKKE-style frame is slightly
+        // slanted at the top, so a polygon mask prevents uploaded art from
+        // spilling over the visible border.
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(18, 164);
+        ctx.lineTo(292, 115);
+        ctx.lineTo(292, 542);
+        ctx.lineTo(18, 542);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(canvasTemp, 17, canvas.height - targetH - 2, targetW, targetH);
+        ctx.restore();
+    } else {
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.fillRect(38, 118, 235, 360);
+        ctx.strokeStyle = "rgba(255,255,255,0.22)";
+        ctx.setLineDash([8, 8]);
+        ctx.strokeRect(38, 118, 235, 360);
+        ctx.setLineDash([]);
+        ctx.fillStyle = "rgba(255,255,255,0.72)";
+        ctx.font = "16px PB, Microsoft YaHei, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("上传当前 NPC 形象图", canvas.width / 2, 285);
+        ctx.font = "12px PB, Microsoft YaHei, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.46)";
+        ctx.fillText("Step 2/Step 8 生成图优先", canvas.width / 2, 307);
+        ctx.textAlign = "left";
+        ctx.restore();
+    }
+
+    // draw border
+    switch (curBorder) {
+        case "normal":
+            break;
+        case "synchro":
+            if (synchroBorder.complete && synchroBorder.naturalWidth > 0) {
+                draw9slice(ctx, synchroBorder, [22, 456, 261, 4], 0, canvas.height - synchroBorder.height, canvas.width, synchroBorder.height + 10);
+            }
+            break;
+        case "trial":
+            if (trialBorder.complete && trialBorder.naturalWidth > 0) {
+                draw9slice(ctx, trialBorder, [22, 456, 261, 4], 0, canvas.height - trialBorder.height, canvas.width, trialBorder.height + 10);
+            }
+            break;
+    }
+
+    // draw deco
+    if (decoOverlay.complete && decoOverlay.naturalWidth > 0) {
+        ctx.globalAlpha = 0.75;
+        ctx.drawImage(decoOverlay, 11, canvas.height - decoOverlay.height + 8);
+    }
+
+    ctx.globalAlpha = 0.5;
+    if (classes[curClass] && classes[curClass].complete && classes[curClass].naturalWidth > 0) {
+        const classWidth = classes[curClass].width * 164 / classSupporter.height;
+        const classHeight = classes[curClass].height * 164 / classSupporter.height;
+        ctx.drawImage(recolorImage(classes[curClass], curColor), canvas.width - 20 - classWidth, canvas.height - 73 - 16 - classHeight / 2, classWidth, classHeight);
+    }
+    ctx.globalAlpha = 1;
+
+    if (curBorder === "synchro" && decoSynchro.complete && decoSynchro.naturalWidth > 0) {
+        const synchroWidth = decoSynchro.width * 54 / 406;
+        const synchroHeight = decoSynchro.height * 54 / 406;
+        for (let i = 0; i < 3; i++) {
+            ctx.drawImage(recolorImage(decoSynchro, "#fe6c00"), canvas.width - synchroWidth - 17 + 5, canvas.height - synchroHeight - 421, synchroWidth, synchroHeight);
+        }
+        ctx.drawImage(decoSynchro, canvas.width - synchroWidth - 17 + 5, canvas.height - synchroHeight - 421, synchroWidth, synchroHeight);
+    }
+
+    if (decoBar2.complete && decoBar2.naturalWidth > 0) {
+        draw9slice(ctx, decoBar2, [0, 36, 283, 2], 11, canvas.height - 44, 283, 47, curColor);
+    }
+    if (decoBar.complete && decoBar.naturalWidth > 0) {
+        ctx.drawImage(recolorImage(decoBar, curColor), 11, canvas.height - decoBar.height + 1);
+    }
+
+    // draw element
+    const frameWidth = 68;
+    const frameHeight = hexFrameDark.naturalHeight * frameWidth / hexFrameDark.naturalWidth;
+    const strokeWidth = 57;
+    const strokeHeight = hexStroke1.naturalHeight * strokeWidth / hexStroke1.naturalWidth;
+
+    if (hexFrameDark.complete && hexFrameDark.naturalWidth > 0) {
+        ctx.drawImage(recolorImage(hexFrameDark, elementColors[curElement]), 14, canvas.height - synchroBorder.height + 4, frameWidth, frameHeight);
+    }
+    if (hexStroke2.complete && hexStroke2.naturalWidth > 0) {
+        ctx.drawImage(recolorImage(hexStroke2, elementColors[curElement]), 14 + (frameWidth - strokeWidth) / 2, canvas.height - synchroBorder.height + 4 + (frameHeight - strokeHeight) / 2, strokeWidth, strokeHeight);
+    }
+
+    if (elements[curElement] && elements[curElement].complete && elements[curElement].naturalWidth > 0) {
+        const elementWidth = elements[curElement].naturalWidth * 44 / 226;
+        const elementHeight = elements[curElement].naturalHeight * 44 / 226;
+        ctx.drawImage(recolorImage(elements[curElement], elementColors[curElement]), 14 + (frameWidth - elementWidth) / 2, canvas.height - synchroBorder.height + 4 + (frameHeight - elementHeight) / 2, elementWidth, elementHeight);
+    }
+
+    // draw weapon
+    if (hexFrameLight.complete && hexFrameLight.naturalWidth > 0) {
+        ctx.drawImage(hexFrameLight, 14, canvas.height - synchroBorder.height + 4 + 72, frameWidth, frameHeight);
+    }
+    if (hexStroke1.complete && hexStroke1.naturalWidth > 0) {
+        ctx.drawImage(recolorImage(hexStroke1, "#323232"), 14 + (frameWidth - strokeWidth) / 2, canvas.height - synchroBorder.height + 4 + 72 + (frameHeight - strokeHeight) / 2, strokeWidth, strokeHeight);
+    }
+    if (weapons[curWeapon] && weapons[curWeapon].complete && weapons[curWeapon].naturalWidth > 0) {
+        const weaponWidth = weapons[curWeapon].naturalWidth * 32 / 73;
+        const weaponHeight = weapons[curWeapon].naturalHeight * 32 / 73;
+        ctx.drawImage(recolorImage(weapons[curWeapon], "#323232"), 14 + (frameWidth - weaponWidth) / 2, canvas.height - synchroBorder.height + 4 + 72 + (frameHeight - weaponHeight) / 2, weaponWidth, weaponHeight);
+    }
+
+    // draw burst
+    if (hexFrameDark.complete && hexFrameDark.naturalWidth > 0) {
+        ctx.drawImage(hexFrameDark, 14, canvas.height - synchroBorder.height + 4 + 144, frameWidth, frameHeight);
+    }
+    if (hexStroke1.complete && hexStroke1.naturalWidth > 0) {
+        ctx.drawImage(hexStroke1, 14 + (frameWidth - strokeWidth) / 2, canvas.height - synchroBorder.height + 4 + 144 + (frameHeight - strokeHeight) / 2, strokeWidth, strokeHeight);
+    }
+    if (bursts["burst" + curBurst] && bursts["burst" + curBurst].complete && bursts["burst" + curBurst].naturalWidth > 0) {
+        const burstWidth = bursts["burst" + curBurst].naturalWidth * 33 / 79;
+        const burstHeight = bursts["burst" + curBurst].naturalHeight * 33 / 79;
+        ctx.drawImage(bursts["burst" + curBurst], 14 + (frameWidth - burstWidth) / 2, canvas.height - synchroBorder.height + 4 + 144 + (frameHeight - burstHeight) / 2, burstWidth, burstHeight);
+    }
+
+    // draw name
+    if (curBorder === "synchro") {
+        ctx.fillStyle = "#ffbe1a";
+    } else {
+        ctx.fillStyle = "#ffffff";
+    }
+
+    ctx.textBaseline = "bottom";
+    ctx.textAlign = "right";
+    ctx.strokeStyle = "#202020";
+    ctx.lineWidth = 3;
+    ctx.shadowColor = "#202020";
+    ctx.shadowBlur = 4;
+    ctx.font = "36px PB";
+    ctx.strokeText(curName, canvas.width - 29, canvas.height - 15);
+    ctx.fillText(curName, canvas.width - 29, canvas.height - 15);
+
+    // draw level
+    ctx.font = "73px ABOL";
+    ctx.textAlign = "left";
+    ctx.strokeText(curLevel.toString().padStart(2, "0"), 20, canvas.height - 11);
+    ctx.fillText(curLevel.toString().padStart(2, "0"), 20, canvas.height - 11);
+
+    ctx.font = "24px AZO";
+    ctx.strokeText("LV.", 23, canvas.height - 85 + 6);
+    ctx.fillText("LV.", 23, canvas.height - 85 + 6);
+
+    // draw limitbreaks
+    const lbWidth = lbFilled.width * 30 / 74;
+    const lbHeight = lbFilled.height * 30 / 74;
+    const coreWidth = coreNumBG.width * 50 / 93;
+    const coreHeight = coreNumBG.height * 50 / 93;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "44px AIRE";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    switch (curRarity.toLowerCase()) {
+        case "ssr": {
+            let starModifier = 0;
+            if (curCopies > 3) {
+                starModifier = 50;
+                if (coreNumBG.complete && coreNumBG.naturalWidth > 0) {
+                    ctx.drawImage(coreNumBG, canvas.width - 29 - coreWidth, canvas.height - 12 - 87 + lbHeight - coreHeight, coreWidth, coreHeight);
+                }
+                const coreMaxWidth = coreMax.width * 38 / coreMax.width;
+                const coreMaxHeight = coreMax.height * 38 / coreMax.width;
+                if (curCopies === 10) {
+                    if (coreMax.complete && coreMax.naturalWidth > 0) {
+                        ctx.drawImage(coreMax, canvas.width - 29 - coreWidth + (coreWidth - coreMaxWidth) / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + (coreHeight - coreMaxHeight) / 2, coreMaxWidth, coreMaxHeight);
+                    }
+                } else {
+                    ctx.fillText((curCopies - 3).toString().padStart(2, "0"), canvas.width - 29 - coreWidth + coreWidth / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + coreHeight / 2, coreWidth);
+                }
+            }
+            for (let i = 0; i < 3; i++) {
+                if (i < curCopies) {
+                    if (lbFilled.complete && lbFilled.naturalWidth > 0) {
+                        ctx.drawImage(lbFilled, canvas.width - 29 + (i * 29) - (2 * 29) - lbWidth - starModifier, canvas.height - 12 - 87, lbWidth, lbHeight);
+                    }
+                } else {
+                    if (lbEmpty.complete && lbEmpty.naturalWidth > 0) {
+                        ctx.drawImage(lbEmpty, canvas.width - 29 + (i * 29) - (2 * 29) - lbWidth - starModifier, canvas.height - 12 - 87, lbWidth, lbHeight);
+                    }
+                }
+            }
+            break;
+        }
+        case "sr": {
+            let starModifier = 0;
+            if (curCopies > 2) {
+                starModifier = 50;
+                if (coreNumBG.complete && coreNumBG.naturalWidth > 0) {
+                    ctx.drawImage(coreNumBG, canvas.width - 29 - coreWidth, canvas.height - 12 - 87 + lbHeight - coreHeight, coreWidth, coreHeight);
+                }
+                const coreMaxWidth = coreMax.width * 38 / coreMax.width;
+                const coreMaxHeight = coreMax.height * 38 / coreMax.width;
+                if (curCopies === 10) {
+                    if (coreMax.complete && coreMax.naturalWidth > 0) {
+                        ctx.drawImage(coreMax, canvas.width - 29 - coreWidth + (coreWidth - coreMaxWidth) / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + (coreHeight - coreMaxHeight) / 2, coreMaxWidth, coreMaxHeight);
+                    }
+                } else {
+                    ctx.fillText((curCopies - 2).toString().padStart(2, "0"), canvas.width - 29 - coreWidth + coreWidth / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + coreHeight / 2, coreWidth);
+                }
+            }
+            for (let i = 0; i < 2; i++) {
+                if (i < curCopies) {
+                    if (lbFilled.complete && lbFilled.naturalWidth > 0) {
+                        ctx.drawImage(lbFilled, canvas.width - 29 + (i * 29) - (1 * 29) - lbWidth - starModifier, canvas.height - 12 - 87, lbWidth, lbHeight);
+                    }
+                } else {
+                    if (lbEmpty.complete && lbEmpty.naturalWidth > 0) {
+                        ctx.drawImage(lbEmpty, canvas.width - 29 + (i * 29) - (1 * 29) - lbWidth - starModifier, canvas.height - 12 - 87, lbWidth, lbHeight);
+                    }
+                }
+            }
+            break;
+        }
+        case "r":
+            if (curCopies > 0) {
+                if (coreNumBG.complete && coreNumBG.naturalWidth > 0) {
+                    ctx.drawImage(coreNumBG, canvas.width - 29 - coreWidth, canvas.height - 12 - 87 + lbHeight - coreHeight, coreWidth, coreHeight);
+                }
+                const coreMaxWidth = coreMax.width * 38 / coreMax.width;
+                const coreMaxHeight = coreMax.height * 38 / coreMax.width;
+                if (curCopies === 10) {
+                    if (coreMax.complete && coreMax.naturalWidth > 0) {
+                        ctx.drawImage(coreMax, canvas.width - 29 - coreWidth + (coreWidth - coreMaxWidth) / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + (coreHeight - coreMaxHeight) / 2, coreMaxWidth, coreMaxHeight);
+                    }
+                } else {
+                    ctx.fillText((curCopies).toString().padStart(2, "0"), canvas.width - 29 - coreWidth + coreWidth / 2, canvas.height - 12 - 87 + lbHeight - coreHeight + coreHeight / 2, coreWidth);
+                }
+            }
+            break;
+    }
+
+    // trim canvas - disabled to preserve bottom text area
+    /*
+    if (!dragging) {
+        const newCanvas = trimCanvas(canvas);
+        canvas.width = newCanvas.width;
+        canvas.height = newCanvas.height;
+        ctx.drawImage(newCanvas, 0, 0);
+    }
+    */
+}
+
+function renderNPCCard(data) {
+    if (data.name) curName = data.name;
+    if (data.rarity) curRarity = data.rarity;
+    if (data.level) curLevel = data.level;
+    if (data.copies) curCopies = data.copies;
+    if (data.class) curClass = data.class;
+    if (data.element) curElement = data.element;
+    if (data.weapon) curWeapon = data.weapon;
+    if (data.burst) curBurst = data.burst;
+    if (data.color) curColor = data.color;
+    if (data.borderType) curBorder = data.borderType;
+    if (data.portrait) {
+        charHasImage = true;
+        char.src = data.portrait;
+    }
+    if (data.transforms) curTransforms = data.transforms;
+
+    generateCard();
+}
+
+// 等待所有图片加载完成后渲染
+let imagesLoaded = 0;
+const allImages = [bg, synchroBorder, trialBorder, decoBar, decoBar2, decoOverlay, decoSynchro, char,
+    classAttacker, classDefender, classSupporter, hexFrameDark, hexFrameLight, hexStroke1, hexStroke2,
+    favoriteIcon, burst1, burst2, burst3, burstall, lbEmpty, lbFilled, coreNumBG, coreMax,
+    ...Object.values(elements), ...Object.values(weapons)];
+
+const totalImages = allImages.length;
+
+function tryRender() {
+    imagesLoaded++;
+    if (imagesLoaded >= totalImages) {
+        generateCard();
+    }
+}
+
+allImages.forEach(img => {
+    if (img.complete && img.naturalWidth > 0) {
+        tryRender();
+    } else {
+        img.onload = tryRender;
+        img.onerror = tryRender;
+    }
+});
+
+// 下载功能
+document.getElementById("download").addEventListener("click", () => {
+    var link = document.createElement('a');
+    var canvas = document.getElementById('card-canvas');
+    link.download = 'npc-card-' + curName + '.png';
+    link.href = canvas.toDataURL();
+    link.click();
+});
+
+document.getElementById("rerender").addEventListener("click", () => {
+    generateCard();
+});
+
+// 暴露全局接口，供 Skill 调用
+window.renderNPCCard = renderNPCCard;
+
+// ========== 控制面板事件监听 ==========
+
+// 名称
+document.getElementById("input-name").addEventListener("input", (e) => {
+    curName = e.target.value;
+    generateCard();
+});
+
+// 主题色
+document.getElementById("input-color").addEventListener("input", (e) => {
+    curColor = e.target.value;
+    generateCard();
+});
+
+// 稀有度按钮
+document.querySelectorAll(".rarity-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".rarity-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        curRarity = btn.dataset.rarity;
+        switch(curRarity) {
+            case "ssr": curColor = "#ffce00"; break;
+            case "sr": curColor = "#fe28fe"; break;
+            case "r": curColor = "#00fefe"; break;
+        }
+        document.getElementById("input-color").value = curColor;
+        generateCard();
+    });
+});
+
+// 图片 X 偏移
+const inputX = document.getElementById("input-x");
+const valX = document.getElementById("val-x");
+inputX.addEventListener("input", (e) => {
+    curTransforms[0] = parseInt(e.target.value);
+    valX.textContent = curTransforms[0];
+    generateCard();
+});
+
+// 图片 Y 偏移
+const inputY = document.getElementById("input-y");
+const valY = document.getElementById("val-y");
+inputY.addEventListener("input", (e) => {
+    curTransforms[1] = parseInt(e.target.value);
+    valY.textContent = curTransforms[1];
+    generateCard();
+});
+
+// 图片缩放
+const inputScale = document.getElementById("input-scale");
+const valScale = document.getElementById("val-scale");
+inputScale.addEventListener("input", (e) => {
+    curTransforms[2] = parseInt(e.target.value) / 100;
+    valScale.textContent = e.target.value + "%";
+    generateCard();
+});
+
+// 图片上传
+document.getElementById("input-upload").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            charHasImage = true;
+            char.src = event.target.result;
+            char.onload = () => generateCard();
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 元素
+document.getElementById("input-element").addEventListener("change", (e) => {
+    curElement = e.target.value;
+    generateCard();
+});
+
+// 武器
+document.getElementById("input-weapon").addEventListener("change", (e) => {
+    curWeapon = e.target.value;
+    generateCard();
+});
+
+// Burst
+document.getElementById("input-burst").addEventListener("change", (e) => {
+    curBurst = e.target.value;
+    generateCard();
+});
+
+// Class
+document.getElementById("input-class").addEventListener("change", (e) => {
+    curClass = e.target.value;
+    generateCard();
+});
+
+// 边框
+document.getElementById("input-border").addEventListener("change", (e) => {
+    curBorder = e.target.value;
+    generateCard();
+});
+
+// 等级
+document.getElementById("input-level").addEventListener("input", (e) => {
+    curLevel = parseInt(e.target.value) || 0;
+    generateCard();
+});
+
+// 星级
+document.getElementById("input-copies").addEventListener("input", (e) => {
+    curCopies = parseInt(e.target.value) || 0;
+    generateCard();
+});
+
+</script>
+</body>
+</html>

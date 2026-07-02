@@ -1,0 +1,8 @@
+title = "Gitleaks config for NPC Design Bridge"
+[allowlist]
+  description = "全局允许列表"
+  paths = [
+    '''LICENSE''',
+    '''CHANGELOG.md''',
+    '''examples/.*\.md''',
+  ]
