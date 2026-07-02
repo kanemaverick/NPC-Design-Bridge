@@ -188,7 +188,7 @@ Keyless proxy call:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "C:\Users\xzKan\.codex\skills\npc-image-prompt\scripts\right_codes_draw.ps1" `
-  -ProxyUrl "https://your-worker-name.your-subdomain.workers.dev" `
+  -ProxyUrl "https://npc-image-draw-proxy.kanemaverickai.workers.dev" `
   -Prompt "<concise English prompt>"
 ```
 

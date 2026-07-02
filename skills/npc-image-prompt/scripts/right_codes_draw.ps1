@@ -11,7 +11,7 @@ param(
   [string]$Moderation = "auto",
   [int]$MaxAttempts = 3,
   [int]$RetryDelaySec = 8,
-  [string]$ProxyUrl = $env:RIGHT_CODES_DRAW_PROXY_URL,
+  [string]$ProxyUrl = $(if ($env:RIGHT_CODES_DRAW_PROXY_URL) { $env:RIGHT_CODES_DRAW_PROXY_URL } else { "https://npc-image-draw-proxy.kanemaverickai.workers.dev" }),
   [string]$BaseUrl = "https://www.right.codes/draw",
   [string]$ApiKey = $env:RIGHT_CODES_DRAW_API_KEY
 )

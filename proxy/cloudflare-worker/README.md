@@ -34,10 +34,16 @@ wrangler deploy
 5. Configure the skill script to use the deployed URL:
 
 ```powershell
-$env:RIGHT_CODES_DRAW_PROXY_URL="https://your-worker-name.your-subdomain.workers.dev"
+$env:RIGHT_CODES_DRAW_PROXY_URL="https://npc-image-draw-proxy.kanemaverickai.workers.dev"
 ```
 
 After this, local users do not need `RIGHT_CODES_DRAW_API_KEY`.
+
+Current deployed endpoint:
+
+```text
+https://npc-image-draw-proxy.kanemaverickai.workers.dev
+```
 
 ## Request
 
