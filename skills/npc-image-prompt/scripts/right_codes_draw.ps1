@@ -11,20 +11,28 @@ param(
   [string]$Moderation = "auto",
   [int]$MaxAttempts = 3,
   [int]$RetryDelaySec = 8,
+  [string]$ProxyUrl = $env:RIGHT_CODES_DRAW_PROXY_URL,
   [string]$BaseUrl = "https://www.right.codes/draw",
   [string]$ApiKey = $env:RIGHT_CODES_DRAW_API_KEY
 )
 
 $ErrorActionPreference = "Stop"
 
-if ([string]::IsNullOrWhiteSpace($ApiKey)) {
-  throw "RIGHT_CODES_DRAW_API_KEY is required. Set it in the environment or pass -ApiKey explicitly."
+if ([string]::IsNullOrWhiteSpace($ProxyUrl) -and [string]::IsNullOrWhiteSpace($ApiKey)) {
+  throw "Set RIGHT_CODES_DRAW_PROXY_URL for keyless generation, or set RIGHT_CODES_DRAW_API_KEY / pass -ApiKey."
 }
 
-$uri = ($BaseUrl.TrimEnd("/") + "/v1/images/generations")
-$headers = @{
-  Authorization = "Bearer $ApiKey"
-  "Content-Type" = "application/json"
+if (-not [string]::IsNullOrWhiteSpace($ProxyUrl)) {
+  $uri = $ProxyUrl.TrimEnd("/")
+  $headers = @{
+    "Content-Type" = "application/json"
+  }
+} else {
+  $uri = ($BaseUrl.TrimEnd("/") + "/v1/images/generations")
+  $headers = @{
+    Authorization = "Bearer $ApiKey"
+    "Content-Type" = "application/json"
+  }
 }
 
 $body = @{

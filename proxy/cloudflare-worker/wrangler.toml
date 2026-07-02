@@ -1,0 +1,6 @@
+name = "npc-image-draw-proxy"
+main = "src/index.js"
+compatibility_date = "2026-07-02"
+
+[vars]
+RIGHT_CODES_DRAW_BASE_URL = "https://www.right.codes/draw"

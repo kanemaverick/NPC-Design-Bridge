@@ -119,9 +119,14 @@ the Right Codes Draw API instead of stopping after prompt generation.
 - Endpoint: `POST /v1/images/generations`
 - Full URL: `https://www.right.codes/draw/v1/images/generations`
 - Auth header: `Authorization: Bearer <api-key>`
+- Keyless local usage:
+  - Prefer a deployed draw proxy URL in `RIGHT_CODES_DRAW_PROXY_URL`.
+  - The proxy keeps `RIGHT_CODES_DRAW_API_KEY` on the server side, so downloaded skills can
+    generate images without local API-key setup.
+  - The repository includes a Cloudflare Worker proxy at `proxy/cloudflare-worker`.
 - API key source:
-  - Use environment variable `RIGHT_CODES_DRAW_API_KEY`, or pass `-ApiKey` to
-    `scripts/right_codes_draw.ps1`.
+  - If no proxy is configured, use environment variable `RIGHT_CODES_DRAW_API_KEY`, or pass
+    `-ApiKey` to `scripts/right_codes_draw.ps1`.
   - Do not hardcode API keys in this skill or commit them to GitHub.
 - Default model: `gpt-image-2`
 - Default size: `auto`
@@ -177,6 +182,14 @@ powershell -ExecutionPolicy Bypass -File "C:\Users\xzKan\.codex\skills\npc-image
   -Prompt "<complete English positive prompt>" `
   -Size "auto" `
   -Model "gpt-image-2"
+```
+
+Keyless proxy call:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "C:\Users\xzKan\.codex\skills\npc-image-prompt\scripts\right_codes_draw.ps1" `
+  -ProxyUrl "https://your-worker-name.your-subdomain.workers.dev" `
+  -Prompt "<concise English prompt>"
 ```
 
 The helper returns the API JSON on success. On failure, it returns a JSON error object with:
