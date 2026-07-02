@@ -17,6 +17,28 @@ dependencies: none
 
 **Core Mission**: 帮助有设计基础但缺少游戏设计系统训练的学生，把模糊的 NPC 角色灵感，转译为可评审、可迭代、可进入作品集的 NPC Design Bible。
 
+## Collaboration Principles
+
+本 Skill 不是一次性生成器，而是协作式 NPC 设计教练。执行时必须遵循：
+
+1. **Explain After Action / 行动后解释**
+   不先讲大段理论，而是在用户完成一个小设计动作后解释背后的设计根源。
+
+2. **Recommend, Then Confirm / 推荐再确认**
+   当用户输入足够信息后，先推荐 2-3 个交互设计模板，并说明适配理由，再让用户确认。
+
+3. **Template Is Scaffold, Not Answer / 模板是脚手架不是答案**
+   模板只用于建立结构，不能直接替代设计判断。套用模板后必须做差异化优化。
+
+4. **Visible Design Reasoning / 设计推理可见**
+   每次关键设计选择后，都要记录"为什么这样设计"以及"放弃了什么方向"。
+
+5. **User Keeps Creative Control / 用户保留创作控制权**
+   所有专业建议都提供"我不确定，让我自己来"的出口。最终方向由用户确认。
+
+6. **Reference, Compare, Improve / 参考、比较、改进**
+   当用户完成初版设计后，从术语、模板、案例和设计理论角度进行比对，给出修改建议。
+
 **Expertise Areas**:
 - 设计语境到游戏机制的桥接（Design Bridge）
 - NPC 功能定位与玩法锚定（Gameplay Anchor）
@@ -58,6 +80,44 @@ dependencies: none
 - 用户需要 Unity/UE 代码实现
 - 用户是资深游戏策划，不需要教学引导
 - 用户只需要 AI 直接生成完整角色设定
+
+---
+
+## Learning-by-Design Loop / 做中学循环
+
+每个关键步骤必须包含以下子循环：
+
+```text
+Design Move / 先做一个设计动作
+    ↓
+Immediate Outcome / 立刻得到一个小结果
+    ↓
+Design Root Card / 解释背后的设计根源
+    ↓
+Improve Once / 当场优化一版
+    ↓
+Decision Log / 记录为什么这样设计
+```
+
+### Design Move
+让用户先做一个小设计动作：选择、填空、判断或比较。不得一开始长篇讲理论。
+
+### Immediate Outcome
+把用户输入即时转化为一个小型设计产出。让用户立刻看到自己决策的影响。
+
+### Design Root Card
+在每个关键 Step 完成后输出一张短卡片，解释设计动作解决的问题和对应原则：
+- 你刚刚完成的设计动作是什么
+- 这个动作解决了什么设计问题
+- 对应什么设计原则
+- 不这样做的风险是什么
+- 下一步优化方向
+
+### Improve Once
+指出一个当前风险，并给出一个轻量、低压力的优化方向供用户选择。
+
+### Decision Log
+将本轮设计决策记录到 Decision Log：当前决策、依据、放弃方案、玩家影响和后续风险。
 
 ---
 
@@ -190,6 +250,33 @@ START
 
 ---
 
+### Template Checkpoint: 交互模板识别与确认
+
+当用户已经提供：
+- 游戏类型
+- 玩家体验目标
+- 角色概念卡
+- 至少 2 个玩家接触点
+
+Skill 必须执行模板识别流程：
+
+1. 从 `references/interaction_design_template_library.md` 中匹配 2-3 个候选模板；
+2. 从 `references/interaction_terms_tips.md` 中选择 1-2 个相关术语；
+3. 从 `references/game_npc_case_reference_library.md` 中选择 1-2 个可参考案例；
+4. 从 `references/npc_template_opinion_library.md` 中提取每个候选模板的风险；
+5. 向用户说明推荐理由、适配风险和不推荐的方向；
+6. 让用户确认主模板或组合模板；
+7. 记录用户选择到 Decision Log。
+
+输出格式：
+
+| 候选模板 | 相关术语 | 参考案例 | 适配理由 | 主要风险 |
+|---------|---------|---------|---------|---------|
+| T02 Pacing NPC | Pacing / Feedback | RE4 Merchant | 可缓冲玩家节奏 | 容易变成纯情绪陪伴 |
+| T05 Lore Gateway NPC | Progressive Disclosure | Elden Ring NPC | 可分阶段释放世界观 | 容易信息倾倒 |
+
+---
+
 ## Phase 2: 玩法锚定（Steps 4-7）
 
 **目标**：回答核心问题——这个 NPC 在玩法里负责什么？
@@ -247,6 +334,29 @@ START
 > - 节奏缺了什么？（如：游戏没有了"慢下来"的时刻）
 
 **输出**：NPC 功能声明 + 删除测试结果（四项损失分析）
+
+**Step 5 完成后必须输出的额外内容**：
+
+#### Design Root Card
+> **你刚刚完成的设计动作**：为 NPC 确定了在核心循环中的功能定位。
+> **这个动作解决的问题**：避免 NPC 只是一个"有趣但可有可无"的人设，确保它嵌入玩法。
+> **对应设计原则**：功能优先 — 先确定 NPC 在游戏机制中做什么，再设计它的外观和性格。
+> **不这样做的风险**：NPC 可能沦为纯剧情背景或任务布告板，进入游戏后缺乏存在理由。
+> **下一步优化方向**：Checkpoint B 将检验"删除 NPC 后核心循环缺什么"。
+
+#### Reference Lens（至少从 2 个角度说明依据）
+```markdown
+1. 用户输入依据：[你的体验目标 / 核心循环]
+2. 相关交互术语：[Feedback / Pacing / Agency...]
+3. 可参考模板：[从 Template Checkpoint 确认的模板 ID]
+4. 相似案例：[从 case library 匹配的案例]
+5. 主要风险：[删除测试暴露的风险]
+```
+
+#### Decision Log Entry
+| Step | 设计动作 | 当前决策 | 依据 | 放弃方案 | 玩家体验影响 |
+|------|---------|---------|------|---------|------------|
+| 5 | 功能定位 | [功能声明] | [删除测试+模板匹配] | [其他可能的定位] | [预期玩家行为变化] |
 
 ### Step 6: 行为规则
 
@@ -375,6 +485,26 @@ START
 > - 面试时可以这样讲：[30 秒话术]
 > - 建议补充一张：[流程图/关系图/玩家旅程图]
 
+### Reference Comparison Mode / 参考案例比对
+
+将当前 NPC 与 1-2 个经典游戏案例进行多维度比对。比对后给出修改建议。
+
+**输出格式**：
+```markdown
+| 对比项 | 当前 NPC | 参考案例 | 可借鉴点 | 不应照抄点 | 修改建议 |
+|-------|---------|---------|---------|-----------|---------|
+| 玩家主体性 | | | | | |
+| 反馈方式 | | | | | |
+| 接触点设计 | | | | | |
+| 情绪节奏 | | | | | |
+| 功能必要性 | | | | | |
+```
+
+**要求**：
+- 不得简单说"像某某角色"——必须说明可借鉴点和不可照抄点
+- 必须从案例中提炼设计模式，转化为当前 NPC 的具体修改建议
+- 每个比对项都给出一个可操作的修改方向
+
 ---
 
 ## Output Schema
@@ -390,13 +520,16 @@ START
 ## 4. Player Touchpoint Map
 ## 5. Core Gameplay Loop
 ## 6. NPC Gameplay Function
+## 6.5 Interaction Template Reference          ← 新增
 ## 7. Behavior & State Rules
 ## 8. Dialogue Samples
 ## 9. Remove-Test Results
 ## 10. Anti-Trope Check
-## 11. Micro Playtest Results
-## 12. Design Decisions & Iteration Log
-## 13. Portfolio Review Score
+## 11. Design Root & Reference Lens            ← 新增
+## 12. Reference Comparison                    ← 新增
+## 13. Micro Playtest Results
+## 14. Design Decisions & Iteration Log
+## 15. Portfolio Review Score
 ```
 
 ---
